@@ -97,6 +97,7 @@
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, strong) NSString *userAgentCreds;
 @property (nonatomic, strong) IONAssetHandler * handler;
+@property (nonatomic, retain) NSTimer *pokeTimer;
 
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 @end
