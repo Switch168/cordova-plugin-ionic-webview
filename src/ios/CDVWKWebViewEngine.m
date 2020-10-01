@@ -117,6 +117,18 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
+ 
+ 
+   [[NSNotificationCenter defaultCenter] addObserver:self
+       selector:@selector(startPoke:)
+       name:@"StartPoking"
+       object:nil];
+   
+   [[NSNotificationCenter defaultCenter] addObserver:self
+         selector:@selector(stopPoke:)
+         name:@"StopPoking"
+         object:nil];
+ 
     if (self) {
         if (NSClassFromString(@"WKWebView") == nil) {
             return nil;
@@ -127,6 +139,43 @@
         self.frame = frame;
     }
     return self;
+}
+
+- (void) startPoke:(NSNotification *) notification
+{
+    self.pokeTimer = [NSTimer scheduledTimerWithTimeInterval:1
+         target:self
+         selector:@selector(pokeWebview)
+         userInfo:nil
+         repeats:YES];
+}
+
+- (void) stopPoke:(NSNotification *) notification
+{
+    // Give a minute before suspending again
+    [NSTimer scheduledTimerWithTimeInterval:60
+        target:self
+        selector:@selector(stopPokeTimed)
+        userInfo:nil
+        repeats:NO];
+}
+
+- (void) stopPokeTimed {
+    if(self.pokeTimer != nil) {
+        [NSTimer scheduledTimerWithTimeInterval:1
+                                         target:self
+                                       selector:@selector(pokeWebview)
+                                       userInfo:nil
+                                        repeats:NO];
+        [self.pokeTimer invalidate];
+        self.pokeTimer = nil;
+    }
+}
+
+- (void) pokeWebview {
+    WKWebView* wkWebView = (WKWebView*)_engineWebView;
+    [wkWebView evaluateJavaScript:@"console.log('-- pokeWebview --');" completionHandler:nil];
+    NSLog (@"pokeWebview");
 }
 
 -(NSString *) getStartPath {
